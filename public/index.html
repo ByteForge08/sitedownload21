@@ -35,6 +35,252 @@
                 <button id="loadBtn" class="btn btn-primary">
                     <i class="fas fa-search"></i>
                     <span>Carregar Informações</span>
+                    <script>
+// Script de diagnóstico e correção
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Mr.Boombastic Downloader inicializando...');
+    
+    // Elementos do DOM
+    const apiStatus = document.getElementById('apiStatus');
+    const statusText = document.querySelector('.status-text');
+    const statusDot = document.querySelector('.status-dot');
+    
+    // Função para testar API
+    async function testAPIConnection() {
+        try {
+            console.log('🔍 Testando conexão com API...');
+            
+            const response = await fetch('/api/test');
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ API Online:', data);
+                
+                // Atualizar UI
+                if (statusDot) statusDot.className = 'status-dot online';
+                if (statusText) statusText.textContent = 'API Online';
+                if (apiStatus) apiStatus.style.color = '#2ecc71';
+                
+                // Mostrar mensagem de sucesso
+                showStatusMessage('✅ API conectada com sucesso!', 'success');
+                
+                return true;
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        } catch (error) {
+            console.error('❌ Erro na conexão com API:', error);
+            
+            // Atualizar UI para erro
+            if (statusDot) statusDot.className = 'status-dot offline';
+            if (statusText) statusText.textContent = 'API Offline';
+            if (apiStatus) apiStatus.style.color = '#e74c3c';
+            
+            // Mostrar mensagem de erro
+            showStatusMessage(`❌ Falha na conexão: ${error.message}`, 'error');
+            
+            return false;
+        }
+    }
+    
+    // Função para mostrar mensagens
+    function showStatusMessage(message, type) {
+        // Criar elemento se não existir
+        let messageDiv = document.getElementById('statusMessage');
+        if (!messageDiv) {
+            messageDiv = document.createElement('div');
+            messageDiv.id = 'statusMessage';
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-family: Arial, sans-serif;
+                z-index: 1000;
+                max-width: 400px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(messageDiv);
+        }
+        
+        // Estilos por tipo
+        const styles = {
+            success: 'linear-gradient(45deg, #27ae60, #219653)',
+            error: 'linear-gradient(45deg, #e74c3c, #c0392b)',
+            info: 'linear-gradient(45deg, #3498db, #2980b9)'
+        };
+        
+        messageDiv.style.background = styles[type] || styles.info;
+        
+        // Conteúdo
+        const icons = {
+            success: '✅',
+            error: '❌',
+            info: 'ℹ️'
+        };
+        
+        messageDiv.innerHTML = `
+            <span style="font-size: 1.2em">${icons[type] || 'ℹ️'}</span>
+            <span style="flex: 1; font-size: 14px;">${message}</span>
+            <button onclick="this.parentElement.remove()" style="
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                font-size: 1.2em;
+                padding: 0 5px;
+                opacity: 0.8;
+            ">×</button>
+        `;
+        
+        // Auto-remover
+        setTimeout(() => {
+            if (messageDiv.parentElement) {
+                messageDiv.remove();
+            }
+        }, 5000);
+    }
+    
+    // Função para testar endpoint /api/info
+    window.testVideoInfo = async function() {
+        const testUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        
+        showStatusMessage('🔍 Testando endpoint /api/info...', 'info');
+        
+        try {
+            const response = await fetch(`/api/info?url=${encodeURIComponent(testUrl)}`);
+            const data = await response.json();
+            
+            console.log('📊 Resposta /api/info:', data);
+            
+            if (data.success) {
+                showStatusMessage(`✅ /api/info funcionando! Encontrou ${data.formats?.length || 0} formatos`, 'success');
+                return data;
+            } else {
+                showStatusMessage(`❌ /api/info erro: ${data.error || 'Desconhecido'}`, 'error');
+                return null;
+            }
+        } catch (error) {
+            showStatusMessage(`💥 Falha em /api/info: ${error.message}`, 'error');
+            return null;
+        }
+    };
+    
+    // Função principal para carregar informações do vídeo (corrigida)
+    window.loadVideoInfo = async function() {
+        const urlInput = document.getElementById('urlInput');
+        const url = urlInput?.value.trim();
+        
+        if (!url) {
+            showStatusMessage('❌ Por favor, insira uma URL do YouTube', 'error');
+            return;
+        }
+        
+        // Verificar se é URL do YouTube
+        if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+            showStatusMessage('⚠️ Isso não parece ser uma URL do YouTube', 'info');
+        }
+        
+        showStatusMessage('🔍 Carregando informações do vídeo...', 'info');
+        
+        try {
+            const response = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
+            const data = await response.json();
+            
+            console.log('📥 Dados recebidos:', data);
+            
+            if (data.success) {
+                // Atualizar a interface com os dados
+                updateVideoUI(data);
+                showStatusMessage(`✅ ${data.formats?.length || 0} formatos carregados!`, 'success');
+            } else {
+                showStatusMessage(`❌ Erro: ${data.error || 'Falha ao carregar vídeo'}`, 'error');
+            }
+        } catch (error) {
+            showStatusMessage(`💥 Falha na requisição: ${error.message}`, 'error');
+        }
+    };
+    
+    // Função para atualizar a UI com dados do vídeo
+    function updateVideoUI(data) {
+        // Atualizar título
+        const titleEl = document.getElementById('videoTitle');
+        if (titleEl && data.title) {
+            titleEl.textContent = data.title;
+        }
+        
+        // Atualizar autor
+        const authorEl = document.getElementById('videoAuthor');
+        if (authorEl && data.author) {
+            authorEl.textContent = data.author;
+        }
+        
+        // Atualizar duração
+        const durationEl = document.getElementById('videoDuration');
+        if (durationEl && data.duration) {
+            const minutes = Math.floor(data.duration / 60);
+            const seconds = data.duration % 60;
+            durationEl.innerHTML = `<i class="fas fa-clock"></i> ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Atualizar thumbnail
+        const thumbnailEl = document.getElementById('videoThumbnail');
+        if (thumbnailEl && data.thumbnail) {
+            thumbnailEl.src = data.thumbnail;
+            thumbnailEl.style.display = 'block';
+        }
+        
+        // Atualizar contagem de formatos
+        const formatCountEl = document.getElementById('formatCount');
+        if (formatCountEl && data.formats) {
+            formatCountEl.textContent = data.formats.length;
+        }
+        
+        // Mostrar seções ocultas
+        document.getElementById('videoInfo')?.classList.add('active');
+        document.getElementById('formatsSection')?.classList.add('active');
+        
+        // Atualizar tabela de formatos (se existir)
+        updateFormatsTable(data.formats || []);
+    }
+    
+    // Função para atualizar tabela de formatos
+    function updateFormatsTable(formats) {
+        const tableBody = document.getElementById('formatsTableBody');
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = '';
+        
+        formats.forEach(format => {
+            const row = document.createElement('tr');
+            
+            // Tipo com cor
+            const typeColors = {
+                'video+audio': '#2ecc71',
+                'video': '#3498db',
+                'audio': '#9b59b6'
+            };
+            
+            row.innerHTML = `
+                <td>
+                    <span class="format-type" style="
+                        background: ${typeColors[format.type] || '#7f8c8d'};
+                        color: white;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                    ">
+                        ${format.type === 'video+audio' ? '🎬+🎵' : 
+                          format.type === 'video' ? '🎬' : '🎵'}
+                    </span>
+                </td>
+                <td>${format
                 </button>
             </div>
             
@@ -181,3 +427,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
