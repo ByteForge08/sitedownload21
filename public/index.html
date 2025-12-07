@@ -6,6 +6,43 @@
     <title>🎬 Mr.Boombastic Downloader Web</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos adicionais para o status */
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.online {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+        
+        .status-dot.offline {
+            background: #e74c3c;
+            box-shadow: 0 0 10px #e74c3c;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -31,256 +68,11 @@
                     id="urlInput" 
                     placeholder="Cole a URL do YouTube aqui (ex: https://www.youtube.com/watch?v=...)"
                     autocomplete="off"
+                    value="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                 >
                 <button id="loadBtn" class="btn btn-primary">
                     <i class="fas fa-search"></i>
                     <span>Carregar Informações</span>
-                    <script>
-// Script de diagnóstico e correção
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Mr.Boombastic Downloader inicializando...');
-    
-    // Elementos do DOM
-    const apiStatus = document.getElementById('apiStatus');
-    const statusText = document.querySelector('.status-text');
-    const statusDot = document.querySelector('.status-dot');
-    
-    // Função para testar API
-    async function testAPIConnection() {
-        try {
-            console.log('🔍 Testando conexão com API...');
-            
-            const response = await fetch('/api/test');
-            
-            if (response.ok) {
-                const data = await response.json();
-                console.log('✅ API Online:', data);
-                
-                // Atualizar UI
-                if (statusDot) statusDot.className = 'status-dot online';
-                if (statusText) statusText.textContent = 'API Online';
-                if (apiStatus) apiStatus.style.color = '#2ecc71';
-                
-                // Mostrar mensagem de sucesso
-                showStatusMessage('✅ API conectada com sucesso!', 'success');
-                
-                return true;
-            } else {
-                throw new Error(`HTTP ${response.status}`);
-            }
-        } catch (error) {
-            console.error('❌ Erro na conexão com API:', error);
-            
-            // Atualizar UI para erro
-            if (statusDot) statusDot.className = 'status-dot offline';
-            if (statusText) statusText.textContent = 'API Offline';
-            if (apiStatus) apiStatus.style.color = '#e74c3c';
-            
-            // Mostrar mensagem de erro
-            showStatusMessage(`❌ Falha na conexão: ${error.message}`, 'error');
-            
-            return false;
-        }
-    }
-    
-    // Função para mostrar mensagens
-    function showStatusMessage(message, type) {
-        // Criar elemento se não existir
-        let messageDiv = document.getElementById('statusMessage');
-        if (!messageDiv) {
-            messageDiv = document.createElement('div');
-            messageDiv.id = 'statusMessage';
-            messageDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                border-radius: 8px;
-                color: white;
-                font-family: Arial, sans-serif;
-                z-index: 1000;
-                max-width: 400px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideIn 0.3s ease;
-            `;
-            document.body.appendChild(messageDiv);
-        }
-        
-        // Estilos por tipo
-        const styles = {
-            success: 'linear-gradient(45deg, #27ae60, #219653)',
-            error: 'linear-gradient(45deg, #e74c3c, #c0392b)',
-            info: 'linear-gradient(45deg, #3498db, #2980b9)'
-        };
-        
-        messageDiv.style.background = styles[type] || styles.info;
-        
-        // Conteúdo
-        const icons = {
-            success: '✅',
-            error: '❌',
-            info: 'ℹ️'
-        };
-        
-        messageDiv.innerHTML = `
-            <span style="font-size: 1.2em">${icons[type] || 'ℹ️'}</span>
-            <span style="flex: 1; font-size: 14px;">${message}</span>
-            <button onclick="this.parentElement.remove()" style="
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                font-size: 1.2em;
-                padding: 0 5px;
-                opacity: 0.8;
-            ">×</button>
-        `;
-        
-        // Auto-remover
-        setTimeout(() => {
-            if (messageDiv.parentElement) {
-                messageDiv.remove();
-            }
-        }, 5000);
-    }
-    
-    // Função para testar endpoint /api/info
-    window.testVideoInfo = async function() {
-        const testUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-        
-        showStatusMessage('🔍 Testando endpoint /api/info...', 'info');
-        
-        try {
-            const response = await fetch(`/api/info?url=${encodeURIComponent(testUrl)}`);
-            const data = await response.json();
-            
-            console.log('📊 Resposta /api/info:', data);
-            
-            if (data.success) {
-                showStatusMessage(`✅ /api/info funcionando! Encontrou ${data.formats?.length || 0} formatos`, 'success');
-                return data;
-            } else {
-                showStatusMessage(`❌ /api/info erro: ${data.error || 'Desconhecido'}`, 'error');
-                return null;
-            }
-        } catch (error) {
-            showStatusMessage(`💥 Falha em /api/info: ${error.message}`, 'error');
-            return null;
-        }
-    };
-    
-    // Função principal para carregar informações do vídeo (corrigida)
-    window.loadVideoInfo = async function() {
-        const urlInput = document.getElementById('urlInput');
-        const url = urlInput?.value.trim();
-        
-        if (!url) {
-            showStatusMessage('❌ Por favor, insira uma URL do YouTube', 'error');
-            return;
-        }
-        
-        // Verificar se é URL do YouTube
-        if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
-            showStatusMessage('⚠️ Isso não parece ser uma URL do YouTube', 'info');
-        }
-        
-        showStatusMessage('🔍 Carregando informações do vídeo...', 'info');
-        
-        try {
-            const response = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
-            const data = await response.json();
-            
-            console.log('📥 Dados recebidos:', data);
-            
-            if (data.success) {
-                // Atualizar a interface com os dados
-                updateVideoUI(data);
-                showStatusMessage(`✅ ${data.formats?.length || 0} formatos carregados!`, 'success');
-            } else {
-                showStatusMessage(`❌ Erro: ${data.error || 'Falha ao carregar vídeo'}`, 'error');
-            }
-        } catch (error) {
-            showStatusMessage(`💥 Falha na requisição: ${error.message}`, 'error');
-        }
-    };
-    
-    // Função para atualizar a UI com dados do vídeo
-    function updateVideoUI(data) {
-        // Atualizar título
-        const titleEl = document.getElementById('videoTitle');
-        if (titleEl && data.title) {
-            titleEl.textContent = data.title;
-        }
-        
-        // Atualizar autor
-        const authorEl = document.getElementById('videoAuthor');
-        if (authorEl && data.author) {
-            authorEl.textContent = data.author;
-        }
-        
-        // Atualizar duração
-        const durationEl = document.getElementById('videoDuration');
-        if (durationEl && data.duration) {
-            const minutes = Math.floor(data.duration / 60);
-            const seconds = data.duration % 60;
-            durationEl.innerHTML = `<i class="fas fa-clock"></i> ${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-        
-        // Atualizar thumbnail
-        const thumbnailEl = document.getElementById('videoThumbnail');
-        if (thumbnailEl && data.thumbnail) {
-            thumbnailEl.src = data.thumbnail;
-            thumbnailEl.style.display = 'block';
-        }
-        
-        // Atualizar contagem de formatos
-        const formatCountEl = document.getElementById('formatCount');
-        if (formatCountEl && data.formats) {
-            formatCountEl.textContent = data.formats.length;
-        }
-        
-        // Mostrar seções ocultas
-        document.getElementById('videoInfo')?.classList.add('active');
-        document.getElementById('formatsSection')?.classList.add('active');
-        
-        // Atualizar tabela de formatos (se existir)
-        updateFormatsTable(data.formats || []);
-    }
-    
-    // Função para atualizar tabela de formatos
-    function updateFormatsTable(formats) {
-        const tableBody = document.getElementById('formatsTableBody');
-        if (!tableBody) return;
-        
-        tableBody.innerHTML = '';
-        
-        formats.forEach(format => {
-            const row = document.createElement('tr');
-            
-            // Tipo com cor
-            const typeColors = {
-                'video+audio': '#2ecc71',
-                'video': '#3498db',
-                'audio': '#9b59b6'
-            };
-            
-            row.innerHTML = `
-                <td>
-                    <span class="format-type" style="
-                        background: ${typeColors[format.type] || '#7f8c8d'};
-                        color: white;
-                        padding: 4px 8px;
-                        border-radius: 4px;
-                        font-size: 12px;
-                    ">
-                        ${format.type === 'video+audio' ? '🎬+🎵' : 
-                          format.type === 'video' ? '🎬' : '🎵'}
-                    </span>
-                </td>
-                <td>${format
                 </button>
             </div>
             
@@ -298,13 +90,13 @@ document.addEventListener('DOMContentLoaded', function() {
         </section>
 
         <!-- Loading Indicator -->
-        <div class="loading" id="loading">
+        <div class="loading" id="loading" style="display: none;">
             <div class="spinner"></div>
             <p>Processando...</p>
         </div>
 
         <!-- Video Info Section -->
-        <section class="video-info" id="videoInfo">
+        <section class="video-info" id="videoInfo" style="display: none;">
             <div class="info-header">
                 <h2 id="videoTitle">Título do Vídeo</h2>
                 <div class="info-badges">
@@ -322,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <div class="info-content">
                 <div class="thumbnail-container">
-                    <img id="videoThumbnail" src="" alt="Thumbnail" class="thumbnail">
+                    <img id="videoThumbnail" src="" alt="Thumbnail" class="thumbnail" style="display: none;">
                     <div class="thumbnail-overlay">
                         <button class="btn-thumbnail" onclick="copyURL()">
                             <i class="fas fa-copy"></i> Copiar URL
@@ -352,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </section>
 
         <!-- Formats Table -->
-        <section class="formats-section" id="formatsSection">
+        <section class="formats-section" id="formatsSection" style="display: none;">
             <div class="section-header">
                 <h3><i class="fas fa-list"></i> Formatos Disponíveis</h3>
                 <div class="format-filters">
@@ -371,7 +163,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             <th>Resolução/Qualidade</th>
                             <th>Formato</th>
                             <th>Tamanho</th>
-                            <th>Codecs</th>
                             <th>Ação</th>
                         </tr>
                     </thead>
@@ -395,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </section>
 
         <!-- Status Messages -->
-        <div class="status-message" id="statusMessage">
+        <div class="status-message" id="statusMessage" style="display: none;">
             <div class="message-content">
                 <i class="fas fa-info-circle"></i>
                 <span id="messageText">Pronto para começar. Cole uma URL do YouTube acima.</span>
@@ -418,13 +209,376 @@ document.addEventListener('DOMContentLoaded', function() {
                 <a href="/api/test" target="_blank">API Test</a>
                 <span>•</span>
                 <a href="/api/health" target="_blank">Health Check</a>
-                <span>•</span>
-                <span id="cacheInfo">Cache: --</span>
             </div>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+    // Script principal - Mr.Boombastic Downloader
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Mr.Boombastic Downloader inicializando...');
+        
+        // Elementos do DOM
+        const apiStatus = document.getElementById('apiStatus');
+        const statusText = document.querySelector('.status-text');
+        const statusDot = document.querySelector('.status-dot');
+        const loadBtn = document.getElementById('loadBtn');
+        const urlInput = document.getElementById('urlInput');
+        const loadingDiv = document.getElementById('loading');
+        const videoInfoDiv = document.getElementById('videoInfo');
+        const formatsSection = document.getElementById('formatsSection');
+        
+        // Funções auxiliares
+        function showMessage(text, type = 'info') {
+            let messageDiv = document.getElementById('statusMessage');
+            if (!messageDiv) {
+                messageDiv = document.createElement('div');
+                messageDiv.id = 'statusMessage';
+                messageDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    color: white;
+                    font-family: Arial, sans-serif;
+                    z-index: 1000;
+                    max-width: 400px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    animation: slideIn 0.3s ease;
+                `;
+                document.body.appendChild(messageDiv);
+            }
+            
+            // Cores por tipo
+            const colors = {
+                success: 'linear-gradient(45deg, #27ae60, #219653)',
+                error: 'linear-gradient(45deg, #e74c3c, #c0392b)',
+                info: 'linear-gradient(45deg, #3498db, #2980b9)'
+            };
+            
+            messageDiv.style.background = colors[type] || colors.info;
+            
+            // Ícones
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            
+            messageDiv.innerHTML = `
+                <span style="font-size: 1.2em">${icons[type] || 'ℹ️'}</span>
+                <span style="flex: 1; font-size: 14px;">${text}</span>
+                <button onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: white;
+                    cursor: pointer;
+                    font-size: 1.2em;
+                    padding: 0 5px;
+                    opacity: 0.8;
+                ">×</button>
+            `;
+            
+            // Auto-remover
+            setTimeout(() => {
+                if (messageDiv.parentElement) {
+                    messageDiv.remove();
+                }
+            }, 5000);
+        }
+        
+        // Testar conexão com API
+        async function testAPIConnection() {
+            try {
+                console.log('🔍 Testando API...');
+                const response = await fetch('/api/test');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ API Online:', data);
+                    
+                    // Atualizar UI
+                    if (statusDot) {
+                        statusDot.className = 'status-dot online';
+                        statusDot.style.background = '#2ecc71';
+                    }
+                    if (statusText) {
+                        statusText.textContent = 'API Online';
+                        statusText.style.color = '#2ecc71';
+                    }
+                    
+                    // Atualizar footer
+                    const footerStatus = document.getElementById('footerStatus');
+                    if (footerStatus) {
+                        footerStatus.textContent = 'Online';
+                        footerStatus.style.color = '#2ecc71';
+                    }
+                    
+                    showMessage('✅ API conectada com sucesso!', 'success');
+                    return true;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('❌ Erro na API:', error);
+                
+                // Atualizar UI para erro
+                if (statusDot) {
+                    statusDot.className = 'status-dot offline';
+                    statusDot.style.background = '#e74c3c';
+                }
+                if (statusText) {
+                    statusText.textContent = 'API Offline';
+                    statusText.style.color = '#e74c3c';
+                }
+                
+                // Atualizar footer
+                const footerStatus = document.getElementById('footerStatus');
+                if (footerStatus) {
+                    footerStatus.textContent = 'Offline';
+                    footerStatus.style.color = '#e74c3c';
+                }
+                
+                showMessage(`❌ API Offline: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Função principal para carregar vídeo
+        async function loadVideoInfo() {
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                showMessage('❌ Por favor, insira uma URL do YouTube', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            if (loadingDiv) loadingDiv.style.display = 'flex';
+            if (loadBtn) loadBtn.disabled = true;
+            
+            try {
+                console.log('📥 Buscando informações para:', url);
+                showMessage('🔍 Carregando informações do vídeo...', 'info');
+                
+                const response = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                console.log('📊 Dados recebidos:', data);
+                
+                if (data.success) {
+                    // Atualizar UI
+                    updateVideoUI(data);
+                    showMessage(`✅ ${data.formats?.length || 0} formatos encontrados!`, 'success');
+                } else {
+                    showMessage(`❌ Erro: ${data.error || 'Falha ao carregar vídeo'}`, 'error');
+                }
+            } catch (error) {
+                console.error('💥 Erro:', error);
+                showMessage(`💥 Falha: ${error.message}`, 'error');
+            } finally {
+                // Esconder loading
+                if (loadingDiv) loadingDiv.style.display = 'none';
+                if (loadBtn) loadBtn.disabled = false;
+            }
+        }
+        
+        // Atualizar interface com dados do vídeo
+        function updateVideoUI(data) {
+            // Título
+            const titleEl = document.getElementById('videoTitle');
+            if (titleEl && data.title) {
+                titleEl.textContent = data.title;
+            }
+            
+            // Autor
+            const authorEl = document.getElementById('videoAuthor');
+            if (authorEl && data.author) {
+                authorEl.textContent = data.author;
+                authorEl.innerHTML = `<i class="fas fa-user"></i> ${data.author}`;
+            }
+            
+            // Duração
+            const durationEl = document.getElementById('videoDuration');
+            if (durationEl && data.duration) {
+                const minutes = Math.floor(data.duration / 60);
+                const seconds = data.duration % 60;
+                durationEl.innerHTML = `<i class="fas fa-clock"></i> ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Views
+            const viewsEl = document.getElementById('videoViews');
+            if (viewsEl && data.view_count) {
+                const views = data.view_count.toLocaleString();
+                viewsEl.innerHTML = `<i class="fas fa-eye"></i> ${views} views`;
+            }
+            
+            // Thumbnail
+            const thumbnailEl = document.getElementById('videoThumbnail');
+            if (thumbnailEl && data.thumbnail) {
+                thumbnailEl.src = data.thumbnail;
+                thumbnailEl.style.display = 'block';
+            }
+            
+            // Contagem de formatos
+            const formatCountEl = document.getElementById('formatCount');
+            if (formatCountEl && data.formats) {
+                formatCountEl.textContent = data.formats.length;
+            }
+            
+            // Mostrar seções
+            if (videoInfoDiv) {
+                videoInfoDiv.style.display = 'block';
+                videoInfoDiv.style.animation = 'slideIn 0.5s ease';
+            }
+            
+            if (formatsSection) {
+                formatsSection.style.display = 'block';
+                formatsSection.style.animation = 'slideIn 0.5s ease';
+            }
+            
+            // Atualizar tabela de formatos
+            updateFormatsTable(data.formats || []);
+        }
+        
+        // Atualizar tabela de formatos
+        function updateFormatsTable(formats) {
+            const tableBody = document.getElementById('formatsTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            formats.forEach(format => {
+                const row = document.createElement('tr');
+                
+                // Cor por tipo
+                let typeColor, typeIcon, typeText;
+                if (format.type === 'video+audio') {
+                    typeColor = '#2ecc71';
+                    typeIcon = '🎬+🎵';
+                    typeText = 'Vídeo+Áudio';
+                } else if (format.type === 'video') {
+                    typeColor = '#3498db';
+                    typeIcon = '🎬';
+                    typeText = 'Vídeo';
+                } else {
+                    typeColor = '#9b59b6';
+                    typeIcon = '🎵';
+                    typeText = 'Áudio';
+                }
+                
+                row.innerHTML = `
+                    <td>
+                        <span style="
+                            background: ${typeColor};
+                            color: white;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            font-size: 12px;
+                            display: inline-block;
+                        ">
+                            ${typeIcon} ${typeText}
+                        </span>
+                    </td>
+                    <td>${format.resolution || 'N/A'}</td>
+                    <td>${format.ext || 'N/A'}</td>
+                    <td>${format.size_mb ? `${format.size_mb} MB` : 'N/A'}</td>
+                    <td>
+                        <button onclick="downloadFormat('${format.id}')" style="
+                            padding: 8px 15px;
+                            background: linear-gradient(45deg, #27ae60, #219653);
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        ">
+                            <i class="fas fa-download"></i> Baixar
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Funções globais
+        window.useExample = function() {
+            urlInput.value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+            showMessage('✅ URL de exemplo inserida', 'success');
+        };
+        
+        window.testAPI = async function() {
+            const isOnline = await testAPIConnection();
+            if (isOnline) {
+                // Testar também o endpoint /api/info
+                try {
+                    const response = await fetch(`/api/info?url=${encodeURIComponent(urlInput.value)}`);
+                    const data = await response.json();
+                    showMessage(`✅ /api/info também funcionando!`, 'success');
+                } catch (error) {
+                    showMessage(`⚠️ /api/info pode ter problemas`, 'error');
+                }
+            }
+        };
+        
+        window.clearAll = function() {
+            urlInput.value = '';
+            if (videoInfoDiv) videoInfoDiv.style.display = 'none';
+            if (formatsSection) formatsSection.style.display = 'none';
+            showMessage('🧹 Tudo limpo!', 'info');
+        };
+        
+        window.downloadFormat = function(formatId) {
+            showMessage(`⚠️ Download do formato ${formatId} em desenvolvimento...`, 'info');
+        };
+        
+        window.downloadBest = function() {
+            showMessage('⚠️ Download da melhor qualidade em desenvolvimento...', 'info');
+        };
+        
+        window.downloadAudio = function() {
+            showMessage('⚠️ Download de áudio em desenvolvimento...', 'info');
+        };
+        
+        window.convertToMP3 = function() {
+            showMessage('⚠️ Conversão para MP3 em desenvolvimento...', 'info');
+        };
+        
+        window.copyURL = function() {
+            navigator.clipboard.writeText(urlInput.value);
+            showMessage('✅ URL copiada para a área de transferência!', 'success');
+        };
+        
+        window.hideMessage = function() {
+            const messageDiv = document.getElementById('statusMessage');
+            if (messageDiv) {
+                messageDiv.style.display = 'none';
+            }
+        };
+        
+        // Configurar eventos
+        if (loadBtn) {
+            loadBtn.addEventListener('click', loadVideoInfo);
+        }
+        
+        if (urlInput) {
+            urlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loadVideoInfo();
+                }
+            });
+        }
+        
+        // Inicializar
+        setTimeout(() => {
+            testAPIConnection();
+        }, 1000);
+    });
+    </script>
 </body>
 </html>
-
