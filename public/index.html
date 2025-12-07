@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Estilos adicionais para o status */
+        /* Estilos adicionais */
         .status-dot {
             width: 12px;
             height: 12px;
@@ -19,12 +19,12 @@
         
         .status-dot.online {
             background: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
         }
         
         .status-dot.offline {
             background: #e74c3c;
-            box-shadow: 0 0 10px #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
         }
         
         @keyframes pulse {
@@ -34,12 +34,198 @@
         
         @keyframes slideIn {
             from {
-                transform: translateX(100%);
+                transform: translateY(20px);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
+                transform: translateY(0);
                 opacity: 1;
+            }
+        }
+        
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: rgba(30, 40, 50, 0.8);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .loading.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(52, 152, 219, 0.2);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .video-info, .formats-section {
+            display: none;
+        }
+        
+        .video-info.active, .formats-section.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .status-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-family: Arial, sans-serif;
+            z-index: 1000;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .status-message.active {
+            display: flex;
+        }
+        
+        .status-message.success {
+            background: linear-gradient(45deg, #27ae60, #219653);
+        }
+        
+        .status-message.error {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+        
+        .status-message.info {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 5px;
+            opacity: 0.8;
+        }
+        
+        .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .format-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .format-type.video-audio {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+        
+        .format-type.video {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        .format-type.audio {
+            background: rgba(155, 89, 182, 0.2);
+            color: #9b59b6;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+        
+        .download-btn {
+            padding: 8px 15px;
+            background: linear-gradient(45deg, #27ae60, #219653);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(45deg, #219653, #1e8449);
+            transform: translateY(-2px);
+        }
+        
+        .btn-action {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px;
+        }
+        
+        .btn-best {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .btn-audio {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+        
+        .btn-mp3 {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #urlInput, #loadBtn {
+                width: 100%;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .btn-action {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -86,17 +272,20 @@
                 <button class="quick-link" onclick="clearAll()">
                     <i class="fas fa-trash"></i> Limpar Tudo
                 </button>
+                <button class="quick-link" onclick="testAllEndpoints()">
+                    <i class="fas fa-vial"></i> Diagnóstico
+                </button>
             </div>
         </section>
 
         <!-- Loading Indicator -->
-        <div class="loading" id="loading" style="display: none;">
+        <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Processando...</p>
+            <p id="loadingText">Processando...</p>
         </div>
 
         <!-- Video Info Section -->
-        <section class="video-info" id="videoInfo" style="display: none;">
+        <section class="video-info" id="videoInfo">
             <div class="info-header">
                 <h2 id="videoTitle">Título do Vídeo</h2>
                 <div class="info-badges">
@@ -109,12 +298,15 @@
                     <span class="badge" id="videoAuthor">
                         <i class="fas fa-user"></i> Autor
                     </span>
+                    <span class="badge" id="videoFormats">
+                        <i class="fas fa-layer-group"></i> 0 formatos
+                    </span>
                 </div>
             </div>
 
             <div class="info-content">
                 <div class="thumbnail-container">
-                    <img id="videoThumbnail" src="" alt="Thumbnail" class="thumbnail" style="display: none;">
+                    <img id="videoThumbnail" src="" alt="Thumbnail" class="thumbnail">
                     <div class="thumbnail-overlay">
                         <button class="btn-thumbnail" onclick="copyURL()">
                             <i class="fas fa-copy"></i> Copiar URL
@@ -124,34 +316,34 @@
 
                 <div class="details">
                     <div class="detail-item">
-                        <label><i class="fas fa-calendar"></i> Data de Upload:</label>
+                        <label><i class="fas fa-calendar"></i> Data:</label>
                         <span id="uploadDate">--</span>
                     </div>
                     <div class="detail-item">
-                        <label><i class="fas fa-tags"></i> Categorias:</label>
-                        <span id="videoCategories">--</span>
+                        <label><i class="fas fa-heart"></i> Likes:</label>
+                        <span id="likeCount">--</span>
                     </div>
                     <div class="detail-item">
-                        <label><i class="fas fa-layer-group"></i> Formatos Disponíveis:</label>
-                        <span id="formatCount">0</span>
+                        <label><i class="fas fa-database"></i> Qualidade:</label>
+                        <span id="bestQuality">--</span>
                     </div>
                     <div class="detail-item description">
-                        <label><i class="fas fa-align-left"></i> Descrição:</label>
-                        <p id="videoDescription">Sem descrição disponível.</p>
+                        <label><i class="fas fa-info-circle"></i> Status:</label>
+                        <p id="apiMode">Carregando informações...</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Formats Table -->
-        <section class="formats-section" id="formatsSection" style="display: none;">
+        <section class="formats-section" id="formatsSection">
             <div class="section-header">
                 <h3><i class="fas fa-list"></i> Formatos Disponíveis</h3>
-                <div class="format-filters">
-                    <button class="filter-btn active" data-filter="all">Todos</button>
-                    <button class="filter-btn" data-filter="video+audio">Vídeo+Áudio</button>
-                    <button class="filter-btn" data-filter="video">Apenas Vídeo</button>
-                    <button class="filter-btn" data-filter="audio">Apenas Áudio</button>
+                <div class="format-filters" id="formatFilters">
+                    <button class="filter-btn active" onclick="filterFormats('all')">Todos</button>
+                    <button class="filter-btn" onclick="filterFormats('video+audio')">Vídeo+Áudio</button>
+                    <button class="filter-btn" onclick="filterFormats('video')">Apenas Vídeo</button>
+                    <button class="filter-btn" onclick="filterFormats('audio')">Apenas Áudio</button>
                 </div>
             </div>
 
@@ -163,13 +355,18 @@
                             <th>Resolução/Qualidade</th>
                             <th>Formato</th>
                             <th>Tamanho</th>
+                            <th>Codec</th>
                             <th>Ação</th>
                         </tr>
                     </thead>
                     <tbody id="formatsTableBody">
-                        <!-- Formatos serão inseridos aqui via JavaScript -->
+                        <!-- Formatos serão inseridos aqui -->
                     </tbody>
                 </table>
+                <div id="noFormats" style="display: none; text-align: center; padding: 20px; color: #95a5a6;">
+                    <i class="fas fa-info-circle" style="font-size: 2em; margin-bottom: 10px;"></i>
+                    <p>Nenhum formato disponível ou ainda carregando...</p>
+                </div>
             </div>
 
             <div class="quick-actions">
@@ -185,383 +382,548 @@
             </div>
         </section>
 
-        <!-- Status Messages -->
-        <div class="status-message" id="statusMessage" style="display: none;">
-            <div class="message-content">
-                <i class="fas fa-info-circle"></i>
-                <span id="messageText">Pronto para começar. Cole uma URL do YouTube acima.</span>
-            </div>
-            <button class="btn-close" onclick="hideMessage()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
         <!-- Footer -->
         <footer class="footer">
             <p>
                 <i class="fas fa-exclamation-triangle"></i>
-                <strong>Aviso:</strong> Esta ferramenta é para fins educacionais. 
-                Respeite os Termos de Serviço do YouTube e direitos autorais.
+                <strong>Aviso:</strong> Para fins educacionais. Respeite os Termos do YouTube.
             </p>
             <div class="footer-links">
-                <span>API Status: <strong id="footerStatus">Checking...</strong></span>
+                <span>Status: <strong id="footerStatus">Checking...</strong></span>
                 <span>•</span>
                 <a href="/api/test" target="_blank">API Test</a>
                 <span>•</span>
-                <a href="/api/health" target="_blank">Health Check</a>
+                <a href="/api/health" target="_blank">Health</a>
+                <span>•</span>
+                <span id="apiVersion">v1.0</span>
             </div>
         </footer>
     </div>
 
+    <!-- Status Message (dinâmico) -->
+    <div class="status-message" id="statusMessage">
+        <div class="message-content">
+            <i class="fas fa-info-circle" id="messageIcon"></i>
+            <span id="messageText">Pronto para começar</span>
+        </div>
+        <button class="btn-close" onclick="hideMessage()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
     <script>
-    // Script principal - Mr.Boombastic Downloader
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Mr.Boombastic Downloader inicializando...');
+    // ==================== CONFIGURAÇÃO ====================
+    const API_ENDPOINTS = {
+        test: '/api/test',
+        health: '/api/health',
+        debug: '/api/debug',
+        simple: '/api/simple',
+        info: '/api/info'
+    };
+    
+    let currentVideoData = null;
+    let allFormats = [];
+    
+    // ==================== FUNÇÕES DE UTILIDADE ====================
+    function showMessage(text, type = 'info', duration = 5000) {
+        const messageDiv = document.getElementById('statusMessage');
+        const messageText = document.getElementById('messageText');
+        const messageIcon = document.getElementById('messageIcon');
         
-        // Elementos do DOM
-        const apiStatus = document.getElementById('apiStatus');
-        const statusText = document.querySelector('.status-text');
-        const statusDot = document.querySelector('.status-dot');
-        const loadBtn = document.getElementById('loadBtn');
-        const urlInput = document.getElementById('urlInput');
-        const loadingDiv = document.getElementById('loading');
-        const videoInfoDiv = document.getElementById('videoInfo');
-        const formatsSection = document.getElementById('formatsSection');
+        if (!messageDiv || !messageText || !messageIcon) return;
         
-        // Funções auxiliares
-        function showMessage(text, type = 'info') {
-            let messageDiv = document.getElementById('statusMessage');
-            if (!messageDiv) {
-                messageDiv = document.createElement('div');
-                messageDiv.id = 'statusMessage';
-                messageDiv.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 15px 20px;
-                    border-radius: 8px;
-                    color: white;
-                    font-family: Arial, sans-serif;
-                    z-index: 1000;
-                    max-width: 400px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    animation: slideIn 0.3s ease;
-                `;
-                document.body.appendChild(messageDiv);
-            }
-            
-            // Cores por tipo
-            const colors = {
-                success: 'linear-gradient(45deg, #27ae60, #219653)',
-                error: 'linear-gradient(45deg, #e74c3c, #c0392b)',
-                info: 'linear-gradient(45deg, #3498db, #2980b9)'
-            };
-            
-            messageDiv.style.background = colors[type] || colors.info;
-            
-            // Ícones
-            const icons = {
-                success: '✅',
-                error: '❌',
-                info: 'ℹ️'
-            };
-            
-            messageDiv.innerHTML = `
-                <span style="font-size: 1.2em">${icons[type] || 'ℹ️'}</span>
-                <span style="flex: 1; font-size: 14px;">${text}</span>
-                <button onclick="this.parentElement.remove()" style="
-                    background: none;
-                    border: none;
-                    color: white;
-                    cursor: pointer;
-                    font-size: 1.2em;
-                    padding: 0 5px;
-                    opacity: 0.8;
-                ">×</button>
-            `;
-            
-            // Auto-remover
+        // Definir classe e ícone baseado no tipo
+        messageDiv.className = 'status-message active ' + type;
+        
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            info: 'fa-info-circle',
+            warning: 'fa-exclamation-triangle'
+        };
+        
+        messageIcon.className = 'fas ' + (icons[type] || icons.info);
+        messageText.textContent = text;
+        
+        // Auto-esconder
+        if (duration > 0) {
             setTimeout(() => {
-                if (messageDiv.parentElement) {
-                    messageDiv.remove();
-                }
-            }, 5000);
+                messageDiv.classList.remove('active');
+            }, duration);
         }
-        
-        // Testar conexão com API
-        async function testAPIConnection() {
-            try {
-                console.log('🔍 Testando API...');
-                const response = await fetch('/api/test');
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('✅ API Online:', data);
-                    
-                    // Atualizar UI
-                    if (statusDot) {
-                        statusDot.className = 'status-dot online';
-                        statusDot.style.background = '#2ecc71';
-                    }
-                    if (statusText) {
-                        statusText.textContent = 'API Online';
-                        statusText.style.color = '#2ecc71';
-                    }
-                    
-                    // Atualizar footer
-                    const footerStatus = document.getElementById('footerStatus');
-                    if (footerStatus) {
-                        footerStatus.textContent = 'Online';
-                        footerStatus.style.color = '#2ecc71';
-                    }
-                    
-                    showMessage('✅ API conectada com sucesso!', 'success');
-                    return true;
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-            } catch (error) {
-                console.error('❌ Erro na API:', error);
-                
-                // Atualizar UI para erro
-                if (statusDot) {
-                    statusDot.className = 'status-dot offline';
-                    statusDot.style.background = '#e74c3c';
-                }
-                if (statusText) {
-                    statusText.textContent = 'API Offline';
-                    statusText.style.color = '#e74c3c';
-                }
-                
-                // Atualizar footer
-                const footerStatus = document.getElementById('footerStatus');
-                if (footerStatus) {
-                    footerStatus.textContent = 'Offline';
-                    footerStatus.style.color = '#e74c3c';
-                }
-                
-                showMessage(`❌ API Offline: ${error.message}`, 'error');
-                return false;
-            }
+    }
+    
+    function hideMessage() {
+        const messageDiv = document.getElementById('statusMessage');
+        if (messageDiv) {
+            messageDiv.classList.remove('active');
         }
+    }
+    
+    function showLoading(text = 'Processando...') {
+        const loadingDiv = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        if (loadingDiv && loadingText) {
+            loadingText.textContent = text;
+            loadingDiv.classList.add('active');
+        }
+    }
+    
+    function hideLoading() {
+        const loadingDiv = document.getElementById('loading');
+        if (loadingDiv) {
+            loadingDiv.classList.remove('active');
+        }
+    }
+    
+    function updateStatus(status, color = '#3498db') {
+        const statusDot = document.querySelector('.status-dot');
+        const statusText = document.querySelector('.status-text');
+        const footerStatus = document.getElementById('footerStatus');
         
-        // Função principal para carregar vídeo
-        async function loadVideoInfo() {
-            const url = urlInput.value.trim();
+        if (statusDot) {
+            statusDot.className = 'status-dot ' + (status === 'online' ? 'online' : 'offline');
+        }
+        if (statusText) {
+            statusText.textContent = status === 'online' ? 'API Online' : 'API Offline';
+            statusText.style.color = status === 'online' ? '#2ecc71' : '#e74c3c';
+        }
+        if (footerStatus) {
+            footerStatus.textContent = status === 'online' ? 'Online' : 'Offline';
+            footerStatus.style.color = status === 'online' ? '#2ecc71' : '#e74c3c';
+        }
+    }
+    
+    // ==================== FUNÇÕES DE API ====================
+    async function testAPIConnection() {
+        try {
+            console.log('🔍 Testando conexão com API...');
+            const response = await fetch(API_ENDPOINTS.test);
             
-            if (!url) {
-                showMessage('❌ Por favor, insira uma URL do YouTube', 'error');
-                return;
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ API Online:', data);
+                updateStatus('online');
+                return true;
+            } else {
+                throw new Error(`HTTP ${response.status}`);
             }
-            
-            // Mostrar loading
-            if (loadingDiv) loadingDiv.style.display = 'flex';
-            if (loadBtn) loadBtn.disabled = true;
-            
+        } catch (error) {
+            console.error('❌ Erro na API:', error);
+            updateStatus('offline');
+            return false;
+        }
+    }
+    
+    async function testAllEndpoints() {
+        showLoading('Executando diagnósticos...');
+        const testUrl = encodeURIComponent('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+        const results = [];
+        
+        const endpoints = [
+            { name: 'Teste Básico', url: API_ENDPOINTS.test },
+            { name: 'Health Check', url: API_ENDPOINTS.health },
+            { name: 'Debug Info', url: `${API_ENDPOINTS.debug}?url=${testUrl}` },
+            { name: 'Endpoint Simples', url: `${API_ENDPOINTS.simple}?url=${testUrl}` },
+            { name: 'Endpoint Completo', url: `${API_ENDPOINTS.info}?url=${testUrl}` }
+        ];
+        
+        for (const endpoint of endpoints) {
             try {
-                console.log('📥 Buscando informações para:', url);
-                showMessage('🔍 Carregando informações do vídeo...', 'info');
-                
-                const response = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
+                console.log(`🧪 Testando: ${endpoint.name}`);
+                const response = await fetch(endpoint.url);
                 const data = await response.json();
                 
-                console.log('📊 Dados recebidos:', data);
+                const result = {
+                    name: endpoint.name,
+                    status: response.ok ? '✅' : '❌',
+                    data: data
+                };
+                
+                results.push(result);
+                console.log(`${result.status} ${endpoint.name}:`, data);
+                
+            } catch (error) {
+                results.push({
+                    name: endpoint.name,
+                    status: '💥',
+                    error: error.message
+                });
+                console.log(`💥 ${endpoint.name}:`, error);
+            }
+        }
+        
+        hideLoading();
+        
+        // Mostrar resumo
+        let message = 'Diagnóstico completo:\n';
+        results.forEach(r => {
+            message += `${r.status} ${r.name}\n`;
+        });
+        
+        showMessage(message, 'info', 8000);
+        
+        // Se algum endpoint funcionar, atualizar status
+        const workingEndpoints = results.filter(r => r.status === '✅');
+        if (workingEndpoints.length > 0) {
+            updateStatus('online');
+        }
+        
+        return results;
+    }
+    
+    async function loadVideoInfo() {
+        const urlInput = document.getElementById('urlInput');
+        const url = urlInput.value.trim();
+        
+        if (!url) {
+            showMessage('❌ Por favor, insira uma URL do YouTube', 'error');
+            return;
+        }
+        
+        // Validar URL do YouTube
+        if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+            showMessage('⚠️ Isso não parece ser uma URL do YouTube válida', 'warning');
+        }
+        
+        showLoading('Carregando informações do vídeo...');
+        
+        // Primeiro tente o endpoint simples
+        try {
+            const encodedUrl = encodeURIComponent(url);
+            
+            // Tentar endpoint simples primeiro
+            let response = await fetch(`${API_ENDPOINTS.simple}?url=${encodedUrl}`);
+            let data = await response.json();
+            
+            console.log('📊 Resposta (simples):', data);
+            
+            if (data.success) {
+                // Marcar que estamos usando dados simples
+                data._mode = 'simple';
+                processVideoData(data);
+                showMessage(`✅ ${data.formats?.length || 0} formatos carregados (modo simples)`, 'success');
+                
+                // Tentar endpoint completo em segundo plano
+                setTimeout(async () => {
+                    try {
+                        const fullResponse = await fetch(`${API_ENDPOINTS.info}?url=${encodedUrl}`);
+                        const fullData = await fullResponse.json();
+                        
+                        if (fullData.success) {
+                            console.log('📊 Resposta (completa):', fullData);
+                            fullData._mode = 'full';
+                            processVideoData(fullData);
+                            showMessage(`✅ Atualizado! ${fullData.formats?.length} formatos disponíveis`, 'success');
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Endpoint completo não disponível, mantendo dados simples');
+                    }
+                }, 500);
+                
+            } else {
+                // Se simples falhar, tentar endpoint completo
+                response = await fetch(`${API_ENDPOINTS.info}?url=${encodedUrl}`);
+                data = await response.json();
                 
                 if (data.success) {
-                    // Atualizar UI
-                    updateVideoUI(data);
-                    showMessage(`✅ ${data.formats?.length || 0} formatos encontrados!`, 'success');
+                    data._mode = 'full';
+                    processVideoData(data);
+                    showMessage(`✅ ${data.formats?.length || 0} formatos carregados`, 'success');
                 } else {
-                    showMessage(`❌ Erro: ${data.error || 'Falha ao carregar vídeo'}`, 'error');
+                    showMessage(`❌ ${data.error || data.detail || 'Falha ao carregar vídeo'}`, 'error');
                 }
-            } catch (error) {
-                console.error('💥 Erro:', error);
-                showMessage(`💥 Falha: ${error.message}`, 'error');
-            } finally {
-                // Esconder loading
-                if (loadingDiv) loadingDiv.style.display = 'none';
-                if (loadBtn) loadBtn.disabled = false;
             }
+        } catch (error) {
+            console.error('💥 Erro:', error);
+            showMessage(`💥 Falha de conexão: ${error.message}`, 'error');
+        } finally {
+            hideLoading();
         }
+    }
+    
+    // ==================== PROCESSAMENTO DE DADOS ====================
+    function processVideoData(data) {
+        currentVideoData = data;
+        allFormats = data.formats || [];
         
-        // Atualizar interface com dados do vídeo
-        function updateVideoUI(data) {
-            // Título
-            const titleEl = document.getElementById('videoTitle');
-            if (titleEl && data.title) {
-                titleEl.textContent = data.title;
-            }
-            
-            // Autor
-            const authorEl = document.getElementById('videoAuthor');
-            if (authorEl && data.author) {
-                authorEl.textContent = data.author;
-                authorEl.innerHTML = `<i class="fas fa-user"></i> ${data.author}`;
-            }
-            
-            // Duração
-            const durationEl = document.getElementById('videoDuration');
-            if (durationEl && data.duration) {
-                const minutes = Math.floor(data.duration / 60);
-                const seconds = data.duration % 60;
-                durationEl.innerHTML = `<i class="fas fa-clock"></i> ${minutes}:${seconds.toString().padStart(2, '0')}`;
-            }
-            
-            // Views
-            const viewsEl = document.getElementById('videoViews');
-            if (viewsEl && data.view_count) {
-                const views = data.view_count.toLocaleString();
-                viewsEl.innerHTML = `<i class="fas fa-eye"></i> ${views} views`;
-            }
-            
-            // Thumbnail
-            const thumbnailEl = document.getElementById('videoThumbnail');
-            if (thumbnailEl && data.thumbnail) {
-                thumbnailEl.src = data.thumbnail;
-                thumbnailEl.style.display = 'block';
-            }
-            
-            // Contagem de formatos
-            const formatCountEl = document.getElementById('formatCount');
-            if (formatCountEl && data.formats) {
-                formatCountEl.textContent = data.formats.length;
-            }
-            
-            // Mostrar seções
-            if (videoInfoDiv) {
-                videoInfoDiv.style.display = 'block';
-                videoInfoDiv.style.animation = 'slideIn 0.5s ease';
-            }
-            
-            if (formatsSection) {
-                formatsSection.style.display = 'block';
-                formatsSection.style.animation = 'slideIn 0.5s ease';
-            }
-            
-            // Atualizar tabela de formatos
-            updateFormatsTable(data.formats || []);
-        }
+        // Atualizar informações básicas
+        updateBasicInfo(data);
         
         // Atualizar tabela de formatos
-        function updateFormatsTable(formats) {
-            const tableBody = document.getElementById('formatsTableBody');
-            if (!tableBody) return;
-            
-            tableBody.innerHTML = '';
-            
-            formats.forEach(format => {
-                const row = document.createElement('tr');
-                
-                // Cor por tipo
-                let typeColor, typeIcon, typeText;
-                if (format.type === 'video+audio') {
-                    typeColor = '#2ecc71';
-                    typeIcon = '🎬+🎵';
-                    typeText = 'Vídeo+Áudio';
-                } else if (format.type === 'video') {
-                    typeColor = '#3498db';
-                    typeIcon = '🎬';
-                    typeText = 'Vídeo';
-                } else {
-                    typeColor = '#9b59b6';
-                    typeIcon = '🎵';
-                    typeText = 'Áudio';
-                }
-                
-                row.innerHTML = `
-                    <td>
-                        <span style="
-                            background: ${typeColor};
-                            color: white;
-                            padding: 4px 8px;
-                            border-radius: 4px;
-                            font-size: 12px;
-                            display: inline-block;
-                        ">
-                            ${typeIcon} ${typeText}
-                        </span>
-                    </td>
-                    <td>${format.resolution || 'N/A'}</td>
-                    <td>${format.ext || 'N/A'}</td>
-                    <td>${format.size_mb ? `${format.size_mb} MB` : 'N/A'}</td>
-                    <td>
-                        <button onclick="downloadFormat('${format.id}')" style="
-                            padding: 8px 15px;
-                            background: linear-gradient(45deg, #27ae60, #219653);
-                            color: white;
-                            border: none;
-                            border-radius: 6px;
-                            cursor: pointer;
-                            font-weight: bold;
-                        ">
-                            <i class="fas fa-download"></i> Baixar
-                        </button>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
+        updateFormatsTable(allFormats);
+        
+        // Mostrar seções
+        document.getElementById('videoInfo').classList.add('active');
+        document.getElementById('formatsSection').classList.add('active');
+        
+        // Atualizar modo da API
+        const apiMode = document.getElementById('apiMode');
+        if (apiMode) {
+            apiMode.textContent = data._mode === 'simple' ? 
+                'Modo Simples (algumas informações podem estar limitadas)' : 
+                'Modo Completo (todas informações disponíveis)';
+            apiMode.style.color = data._mode === 'simple' ? '#f39c12' : '#2ecc71';
+        }
+    }
+    
+    function updateBasicInfo(data) {
+        // Título
+        const titleEl = document.getElementById('videoTitle');
+        if (titleEl && data.title) {
+            titleEl.textContent = data.title.length > 60 ? data.title.substring(0, 60) + '...' : data.title;
         }
         
-        // Funções globais
-        window.useExample = function() {
-            urlInput.value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-            showMessage('✅ URL de exemplo inserida', 'success');
-        };
+        // Autor
+        const authorEl = document.getElementById('videoAuthor');
+        if (authorEl && data.author) {
+            authorEl.innerHTML = `<i class="fas fa-user"></i> ${data.author}`;
+        }
         
-        window.testAPI = async function() {
-            const isOnline = await testAPIConnection();
+        // Duração
+        const durationEl = document.getElementById('videoDuration');
+        if (durationEl && data.duration) {
+            const minutes = Math.floor(data.duration / 60);
+            const seconds = data.duration % 60;
+            durationEl.innerHTML = `<i class="fas fa-clock"></i> ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Views
+        const viewsEl = document.getElementById('videoViews');
+        if (viewsEl && data.view_count) {
+            const views = data.view_count > 1000 ? 
+                (data.view_count / 1000).toFixed(1) + 'K' : 
+                data.view_count.toString();
+            viewsEl.innerHTML = `<i class="fas fa-eye"></i> ${views} views`;
+        }
+        
+        // Likes
+        const likesEl = document.getElementById('likeCount');
+        if (likesEl && data.like_count) {
+            likesEl.textContent = data.like_count.toLocaleString();
+        }
+        
+        // Thumbnail
+        const thumbnailEl = document.getElementById('videoThumbnail');
+        if (thumbnailEl) {
+            if (data.thumbnail) {
+                thumbnailEl.src = data.thumbnail;
+                thumbnailEl.style.display = 'block';
+            } else {
+                // Thumbnail padrão
+                thumbnailEl.src = 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg';
+            }
+        }
+        
+        // Melhor qualidade
+        const qualityEl = document.getElementById('bestQuality');
+        if (qualityEl && data.best_video) {
+            qualityEl.textContent = data.best_video.resolution || 'HD';
+        }
+        
+        // Contagem de formatos
+        const formatsEl = document.getElementById('videoFormats');
+        if (formatsEl && data.formats) {
+            formatsEl.innerHTML = `<i class="fas fa-layer-group"></i> ${data.formats.length} formatos`;
+        }
+    }
+    
+    function updateFormatsTable(formats) {
+        const tableBody = document.getElementById('formatsTableBody');
+        const noFormatsDiv = document.getElementById('noFormats');
+        
+        if (!tableBody || !noFormatsDiv) return;
+        
+        // Limpar tabela
+        tableBody.innerHTML = '';
+        
+        if (!formats || formats.length === 0) {
+            tableBody.style.display = 'none';
+            noFormatsDiv.style.display = 'block';
+            return;
+        }
+        
+        tableBody.style.display = 'table-row-group';
+        noFormatsDiv.style.display = 'none';
+        
+        // Adicionar cada formato
+        formats.forEach((format, index) => {
+            const row = document.createElement('tr');
+            
+            // Tipo
+            let typeClass, typeIcon, typeText;
+            if (format.type === 'video+audio') {
+                typeClass = 'video-audio';
+                typeIcon = '🎬+🎵';
+                typeText = 'Vídeo+Áudio';
+            } else if (format.type === 'video') {
+                typeClass = 'video';
+                typeIcon = '🎬';
+                typeText = 'Vídeo';
+            } else {
+                typeClass = 'audio';
+                typeIcon = '🎵';
+                typeText = 'Áudio';
+            }
+            
+            // Codec info
+            let codecInfo = '--';
+            if (format.codec) {
+                const parts = [];
+                if (format.codec.video && format.codec.video !== 'none') parts.push(format.codec.video);
+                if (format.codec.audio && format.codec.audio !== 'none') parts.push(format.codec.audio);
+                codecInfo = parts.join(' + ') || '--';
+            }
+            
+            row.innerHTML = `
+                <td>
+                    <span class="format-type ${typeClass}" title="${typeText}">
+                        ${typeIcon} ${typeText}
+                    </span>
+                </td>
+                <td><strong>${format.resolution || 'N/A'}</strong> ${format.quality ? `(${format.quality})` : ''}</td>
+                <td><code>.${format.ext || 'unknown'}</code></td>
+                <td>${format.size_mb ? `<strong>${format.size_mb} MB</strong>` : 'N/A'}</td>
+                <td><small>${codecInfo}</small></td>
+                <td>
+                    <button class="download-btn" onclick="downloadFormat('${format.id}', ${index})" title="Baixar este formato">
+                        <i class="fas fa-download"></i> Baixar
+                    </button>
+                </td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+    }
+    
+    function filterFormats(type) {
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        let filteredFormats = [];
+        
+        if (type === 'all') {
+            filteredFormats = allFormats;
+        } else {
+            filteredFormats = allFormats.filter(f => f.type === type);
+        }
+        
+        updateFormatsTable(filteredFormats);
+        
+        if (filteredFormats.length === 0 && allFormats.length > 0) {
+            showMessage(`Nenhum formato do tipo "${type}" encontrado`, 'info', 3000);
+        }
+    }
+    
+    // ==================== FUNÇÕES DE DOWNLOAD ====================
+    function downloadFormat(formatId, index) {
+        if (!currentVideoData) return;
+        
+        const format = allFormats[index];
+        if (!format) return;
+        
+        showMessage(`📥 Preparando download: ${format.resolution || format.type} (${format.ext})`, 'info');
+        
+        // Simulação de download (substituir por implementação real)
+        setTimeout(() => {
+            showMessage(`⚠️ Funcionalidade de download em desenvolvimento. ID: ${formatId}`, 'warning');
+        }, 1000);
+    }
+    
+    function downloadBest() {
+        if (!currentVideoData || !currentVideoData.best_video) {
+            showMessage('❌ Nenhum vídeo carregado para download', 'error');
+            return;
+        }
+        
+        showMessage(`🎯 Preparando melhor qualidade: ${currentVideoData.best_video.resolution}`, 'info');
+        
+        // Simulação
+        setTimeout(() => {
+            showMessage('⚠️ Download da melhor qualidade em desenvolvimento', 'warning');
+        }, 1000);
+    }
+    
+    function downloadAudio() {
+        if (!currentVideoData) {
+            showMessage('❌ Nenhum vídeo carregado', 'error');
+            return;
+        }
+        
+        // Encontrar melhor áudio
+        const bestAudio = allFormats.filter(f => f.type === 'audio')
+            .sort((a, b) => (b.size_mb || 0) - (a.size_mb || 0))[0];
+        
+        if (!bestAudio) {
+            showMessage('❌ Nenhum formato de áudio disponível', 'error');
+            return;
+        }
+        
+        showMessage(`🎵 Preparando áudio: ${bestAudio.ext.toUpperCase()} (${bestAudio.size_mb}MB)`, 'info');
+        
+        // Simulação
+        setTimeout(() => {
+            showMessage('⚠️ Download de áudio em desenvolvimento', 'warning');
+        }, 1000);
+    }
+    
+    function convertToMP3() {
+        showMessage('⚠️ Conversão para MP3 em desenvolvimento', 'warning');
+    }
+    
+    // ==================== FUNÇÕES AUXILIARES ====================
+    function useExample() {
+        const urlInput = document.getElementById('urlInput');
+        urlInput.value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        showMessage('✅ URL de exemplo inserida', 'success');
+    }
+    
+    function testAPI() {
+        testAPIConnection().then(isOnline => {
             if (isOnline) {
-                // Testar também o endpoint /api/info
-                try {
-                    const response = await fetch(`/api/info?url=${encodeURIComponent(urlInput.value)}`);
-                    const data = await response.json();
-                    showMessage(`✅ /api/info também funcionando!`, 'success');
-                } catch (error) {
-                    showMessage(`⚠️ /api/info pode ter problemas`, 'error');
-                }
+                showMessage('✅ API online e funcionando!', 'success');
+            } else {
+                showMessage('❌ API offline. Verifique o servidor.', 'error');
             }
-        };
+        });
+    }
+    
+    function clearAll() {
+        const urlInput = document.getElementById('urlInput');
+        urlInput.value = '';
         
-        window.clearAll = function() {
-            urlInput.value = '';
-            if (videoInfoDiv) videoInfoDiv.style.display = 'none';
-            if (formatsSection) formatsSection.style.display = 'none';
-            showMessage('🧹 Tudo limpo!', 'info');
-        };
+        document.getElementById('videoInfo').classList.remove('active');
+        document.getElementById('formatsSection').classList.remove('active');
         
-        window.downloadFormat = function(formatId) {
-            showMessage(`⚠️ Download do formato ${formatId} em desenvolvimento...`, 'info');
-        };
+        currentVideoData = null;
+        allFormats = [];
         
-        window.downloadBest = function() {
-            showMessage('⚠️ Download da melhor qualidade em desenvolvimento...', 'info');
-        };
-        
-        window.downloadAudio = function() {
-            showMessage('⚠️ Download de áudio em desenvolvimento...', 'info');
-        };
-        
-        window.convertToMP3 = function() {
-            showMessage('⚠️ Conversão para MP3 em desenvolvimento...', 'info');
-        };
-        
-        window.copyURL = function() {
-            navigator.clipboard.writeText(urlInput.value);
-            showMessage('✅ URL copiada para a área de transferência!', 'success');
-        };
-        
-        window.hideMessage = function() {
-            const messageDiv = document.getElementById('statusMessage');
-            if (messageDiv) {
-                messageDiv.style.display = 'none';
-            }
-        };
+        showMessage('🧹 Interface limpa. Insira uma nova URL.', 'info');
+    }
+    
+    function copyURL() {
+        const urlInput = document.getElementById('urlInput');
+        navigator.clipboard.writeText(urlInput.value)
+            .then(() => showMessage('✅ URL copiada para a área de transferência!', 'success'))
+            .catch(() => showMessage('❌ Falha ao copiar URL', 'error'));
+    }
+    
+    function formatDuration(seconds) {
+        if (!seconds) return '00:00';
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    // ==================== INICIALIZAÇÃO ====================
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Mr.Boombastic Downloader inicializado');
         
         // Configurar eventos
+        const loadBtn = document.getElementById('loadBtn');
+        const urlInput = document.getElementById('urlInput');
+        
         if (loadBtn) {
             loadBtn.addEventListener('click', loadVideoInfo);
         }
@@ -574,11 +936,38 @@
             });
         }
         
-        // Inicializar
+        // Configurar filtros
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Testar API automaticamente
         setTimeout(() => {
             testAPIConnection();
         }, 1000);
+        
+        // Mostrar mensagem inicial
+        setTimeout(() => {
+            showMessage('🔍 Cole uma URL do YouTube acima e clique em "Carregar Informações"', 'info', 8000);
+        }, 2000);
     });
+    
+    // ==================== FUNÇÕES GLOBAIS ====================
+    window.useExample = useExample;
+    window.testAPI = testAPI;
+    window.clearAll = clearAll;
+    window.testAllEndpoints = testAllEndpoints;
+    window.downloadFormat = downloadFormat;
+    window.downloadBest = downloadBest;
+    window.downloadAudio = downloadAudio;
+    window.convertToMP3 = convertToMP3;
+    window.filterFormats = filterFormats;
+    window.copyURL = copyURL;
+    window.hideMessage = hideMessage;
     </script>
 </body>
 </html>
