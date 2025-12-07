@@ -1,48 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>YouTube Info Test</title>
     <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial; padding: 20px; }
-        input { width: 400px; padding: 10px; }
-        button { padding: 10px 20px; }
-        #result { margin-top: 20px; white-space: pre-wrap; background: #f5f5f5; padding: 15px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Mr.Boombastic Downloader Web</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>Teste YouTube Info API</h1>
-    <input type="text" id="url" placeholder="Cole URL do YouTube" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
-    <button onclick="getInfo()">Obter Informações</button>
-    <div id="result">Resultado aparecerá aqui...</div>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <h1>Mr.Boombastic Downloader</h1>
+            </div>
+            <p class="subtitle">Obtenha informações de qualquer vídeo do YouTube</p>
+            <div class="status-badge" id="apiStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Conectando...</span>
+            </div>
+        </header>
 
-    <script>
-        async function getInfo() {
-            const url = document.getElementById('url').value;
-            const resultDiv = document.getElementById('result');
+        <!-- Main Input Section -->
+        <section class="input-section">
+            <div class="input-group">
+                <i class="fas fa-link input-icon"></i>
+                <input 
+                    type="text" 
+                    id="urlInput" 
+                    placeholder="Cole a URL do YouTube aqui (ex: https://www.youtube.com/watch?v=...)"
+                    autocomplete="off"
+                >
+                <button id="loadBtn" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    <span>Carregar Informações</span>
+                </button>
+            </div>
             
-            resultDiv.textContent = 'Carregando...';
-            
-            try {
-                const response = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    resultDiv.textContent = JSON.stringify(data, null, 2);
-                } else {
-                    resultDiv.textContent = `Erro: ${data.error}`;
-                }
-            } catch (error) {
-                resultDiv.textContent = `Falha na requisição: ${error}`;
-            }
-        }
-        
-        // Teste inicial
-        setTimeout(() => {
-            fetch('/api/health')
-                .then(r => r.json())
-                .then(data => console.log('API Health:', data));
-        }, 1000);
-    </script>
+            <div class="quick-links">
+                <button class="quick-link" onclick="useExample()">
+                    <i class="fas fa-magic"></i> URL de Exemplo
+                </button>
+                <button class="quick-link" onclick="testAPI()">
+                    <i class="fas fa-bolt"></i> Testar API
+                </button>
+                <button class="quick-link" onclick="clearAll()">
+                    <i class="fas fa-trash"></i> Limpar Tudo
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processando...</p>
+        </div>
+
+        <!-- Video Info Section -->
+        <section class="video-info" id="videoInfo">
+            <div class="info-header">
+                <h2 id="videoTitle">Título do Vídeo</h2>
+                <div class="info-badges">
+                    <span class="badge" id="videoDuration">
+                        <i class="fas fa-clock"></i> 00:00
+                    </span>
+                    <span class="badge" id="videoViews">
+                        <i class="fas fa-eye"></i> 0 views
+                    </span>
+                    <span class="badge" id="videoAuthor">
+                        <i class="fas fa-user"></i> Autor
+                    </span>
+                </div>
+            </div>
+
+            <div class="info-content">
+                <div class="thumbnail-container">
+                    <img id="videoThumbnail" src="" alt="Thumbnail" class="thumbnail">
+                    <div class="thumbnail-overlay">
+                        <button class="btn-thumbnail" onclick="copyURL()">
+                            <i class="fas fa-copy"></i> Copiar URL
+                        </button>
+                    </div>
+                </div>
+
+                <div class="details">
+                    <div class="detail-item">
+                        <label><i class="fas fa-calendar"></i> Data de Upload:</label>
+                        <span id="uploadDate">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <label><i class="fas fa-tags"></i> Categorias:</label>
+                        <span id="videoCategories">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <label><i class="fas fa-layer-group"></i> Formatos Disponíveis:</label>
+                        <span id="formatCount">0</span>
+                    </div>
+                    <div class="detail-item description">
+                        <label><i class="fas fa-align-left"></i> Descrição:</label>
+                        <p id="videoDescription">Sem descrição disponível.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Formats Table -->
+        <section class="formats-section" id="formatsSection">
+            <div class="section-header">
+                <h3><i class="fas fa-list"></i> Formatos Disponíveis</h3>
+                <div class="format-filters">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="video+audio">Vídeo+Áudio</button>
+                    <button class="filter-btn" data-filter="video">Apenas Vídeo</button>
+                    <button class="filter-btn" data-filter="audio">Apenas Áudio</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="formats-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Resolução/Qualidade</th>
+                            <th>Formato</th>
+                            <th>Tamanho</th>
+                            <th>Codecs</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="formatsTableBody">
+                        <!-- Formatos serão inseridos aqui via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn-action btn-best" onclick="downloadBest()">
+                    <i class="fas fa-crown"></i> Melhor Qualidade
+                </button>
+                <button class="btn-action btn-audio" onclick="downloadAudio()">
+                    <i class="fas fa-music"></i> Melhor Áudio
+                </button>
+                <button class="btn-action btn-mp3" onclick="convertToMP3()">
+                    <i class="fas fa-file-audio"></i> Converter para MP3
+                </button>
+            </div>
+        </section>
+
+        <!-- Status Messages -->
+        <div class="status-message" id="statusMessage">
+            <div class="message-content">
+                <i class="fas fa-info-circle"></i>
+                <span id="messageText">Pronto para começar. Cole uma URL do YouTube acima.</span>
+            </div>
+            <button class="btn-close" onclick="hideMessage()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Aviso:</strong> Esta ferramenta é para fins educacionais. 
+                Respeite os Termos de Serviço do YouTube e direitos autorais.
+            </p>
+            <div class="footer-links">
+                <span>API Status: <strong id="footerStatus">Checking...</strong></span>
+                <span>•</span>
+                <a href="/api/test" target="_blank">API Test</a>
+                <span>•</span>
+                <a href="/api/health" target="_blank">Health Check</a>
+                <span>•</span>
+                <span id="cacheInfo">Cache: --</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
